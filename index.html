@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Firbse</title>  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: #1e40af;
+      color: #fff;
+      padding: 1.7rem 0.1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      height: 10px;
+    }
+    header h1 { font-size: 1.25rem; }
+    nav {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      transition: background 0.3s;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    nav a:hover { background: rgba(255, 255, 255, 0.2); }
+    .hero {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      background: #fff;
+    }
+    .hero h2 { font-size: 1.75rem; margin-bottom: 1rem; }
+    .hero p { font-size: 1rem; margin-bottom: 1.5rem; }
+    .hero .btn {
+      padding: 0.65rem 1.25rem;
+      background: #1e40af;
+      color: #fff;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .hero .btn:hover { background: #1c3faa; }
+    .form-section {
+      display: none;
+      width: 90%;
+      max-width: 400px;
+      background: #fff;
+      margin: 2rem auto;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-section.active { display: block; }
+    form h3 {
+      text-align: center;
+      margin-bottom: 1.2rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 0.4rem;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    .input-group {
+      position: relative;
+    }
+   .toggle-password {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #4b5563;
+      transition: transform 0.3s ease;
+    }
+    .toggle-password.active {
+      transform: translateY(-50%) rotate(180deg);
+    }
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+    .form-footer a {
+      color: #1e40af;
+     text-decoration: none;    }
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: #1e40af;
+      color: #fff;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;    }
+    button:hover { background: #1c3faa; }
+   .popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #10b981;
+      color: #fff;
+      padding: 1rem 2rem;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 999;
+      font-size: 0.95rem;    }
+    footer {
+      background: #1e40af;
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      margin-top: auto    }
+    .help-page {
+      display: none;
+      text-align: center;
+      padding: 2rem;    }
+    .help-page.active {
+      display: block;    }
+    @media (min-width: 600px) {
+      header h1 { font-size: 1.5rem; }
+      .hero h2 { font-size: 2rem; }
+      .hero p { font-size: 1.1rem; }
+      nav a { font-size: 1rem; }    }
+    .avatar-menu {
+      position: relative;
+      display: inline-block;    }
+  .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: white;
+      min-width: 150px;
+      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+      border-radius: 0.5rem;
+      overflow: hidden;
+    z-index: 1001; }
+   .dropdown-content a {
+      color: #1e40af;
+      padding: 0.75rem 1rem;
+      text-decoration: none;
+      display: block;
+      font-size: 0.9rem;    }
+    .dropdown-content a:hover {
+      background-color: #f3f4f6; }
+    .avatar-menu:hover .dropdown-content {
+      display: block;    }
+    .avatar-menu div:focus,
+    .avatar-menu div:active {
+      outline: none;
+      background: transparent   } </style>
+  <script>
+    function toggleForm(type) {
+      ['loginForm', 'signupForm', 'helpPage'].forEach(id => document.getElementById(id).classList.remove('active'));
+      document.getElementById("heroSection").style.display = type === 'none' ? 'block' : 'none';
+      if (type === 'login') document.getElementById("loginForm").classList.add("active");
+      else if (type === 'signup') document.getElementById("signupForm").classList.add("active");
+      else if (type === 'help') document.getElementById("helpPage").classList.add("active");
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });    }
+    function nextStep() {
+      const name = document.getElementById("name").value,
+        email = document.getElementById("email").value,
+        password = document.getElementById("password").value;
+      localStorage.setItem("userName", name);
+      localStorage.setItem("userEmail", email);
+      localStorage.setItem("userPassword", password);
+      showPopup("Account created successfully ✅");
+      toggleForm('login');    }
+   function showPopup(message) {
+      const popup = document.getElementById("popup");
+      popup.textContent = message;
+      popup.style.display = "block";
+      setTimeout(() => popup.style.display = "none", 3000);    }
+    function togglePassword(id) {
+      const input = document.getElementById(id);
+      const toggle = input.nextElementSibling;
+      if (input.type === "password") {
+        input.type = "text";
+        toggle.classList.add("active");
+      } else {
+        input.type = "password";
+        toggle.classList.remove("active");
+      }
+    }
+  function login() {
+      const email = document.getElementById("email").value,
+        password = document.getElementById("password").value;
+      const storedEmail = localStorage.getItem("email"),
+        storedPassword = localStorage.getItem("password");
+      showPopup(email === storedEmail && password === storedPassword ? "Login successful ✅" : "Invalid credentials ❌");
+    }
+
+    function help() { toggleForm('help'); }
+
+    window.onload = () => toggleForm('none');
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const isOpen = sidebar.style.left === "0px";
+      sidebar.style.left = isOpen ? "-250px" : "0px";
+    }
+
+    document.addEventListener("click", function (e) {
+      const avatarMenu = document.querySelector(".avatar-menu");
+      const dropdown = document.querySelector(".dropdown-content");
+      if (!avatarMenu.contains(e.target)) {
+        dropdown.style.display = "none";
+      } else {
+        dropdown.style.display = "block";
+      }
+    });
+  </script>
+<!-- Firebase Scripts - keep these at the top before your custom scripts -->
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDpt90p8FMX2OexbBzjWFXP7Gl9HABXudc",
+    authDomain: "almst-7a158.firebaseapp.com",
+    databaseURL: "https://almst-7a158-default-rtdb.firebaseio.com/",
+    projectId: "almst-7a158",
+    storageBucket: "almst-7a158.appspot.com",
+    messagingSenderId: "1060983500671",
+    appId: "1:1060983500671:web:0be69a053e974e9337f44a",
+    measurementId: "G-JM4TV6YGHE"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const database = firebase.database();
+</script>
+
+
+
+<script>
+  function handleSignup() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    auth.createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+
+        // Save additional user info to Realtime Database
+        return database.ref('users/' + user.uid).set({
+          name: name,
+          email: email
+        });
+      })
+      .then(() => {
+        showPopup("✅ Signup successful!");
+        toggleForm('login');
+      })
+      .catch((error) => {
+        showPopup("❌ " + error.message);
+      });
+  }
+</script>
+
+  
+  
+<script>
+  function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      showPopup("✅ Login successful!");
+      // Optional: You can redirect or show additional content here
+    })
+    .catch((error) => {
+      showPopup("❌ " + error.message);
+    });
+}
+
+</script>
+
+  
+  
+
+  
+  <!-- Firebase App (Core SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+
+<!-- Firebase Auth -->
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
+
+<!-- Firebase Realtime Database -->
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js"></script>
+
+ 
+  
+  
+</head>
+<body>
+  <div id="popup" class="popup"></div>
+  <header>
+    <div onclick="toggleSidebar()" style="position: absolute; top: 1rem; left: 1rem; font-size: 1.5rem; cursor: pointer; z-index: 1000; color: #fff;">☰</div>
+    <div class="avatar-menu" style="position: absolute; top: .7rem; right: 1rem; cursor: pointer;">    
+     <div style="width: 36px; height: 36px; background-color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center;">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="#1e40af" width="20" height="20">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9.001 9.001 0 0112 15a9.001 9.001 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </div>
+      
+    </div>
+  </header>
+
+  <div id="sidebar" style="position: fixed; top: 0; left: -250px; width: 200px; height: 100%; background: #111827; color: white; padding-top: 60px; transition: 0.3s; z-index: 999; display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.2); margin: 0;" />
+      <a onclick="toggleForm('none'); toggleSidebar()" style="display: block; padding: 1rem; text-decoration: none; color: white;">Home</a>
+      <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.2); margin: 0;" />
+      <a onclick="toggleForm('signup'); toggleSidebar()" style="display: block; padding: 1rem; text-decoration: none; color: white;">Login / Sign Up</a>
+      <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.2); margin: 0;" />
+      <a onclick="toggleForm('help'); toggleSidebar()" style="display: block; padding: 1rem; text-decoration: none; color: white;">Help</a>
+    </div>
+    <a onclick="toggleSidebar()" style="display: block; padding: 1rem; text-decoration: none; color: white; border-top: 1px solid rgba(255,255,255,0.2); text-align:center;">Back</a>
+  </div>
+ 
+  <section id="heroSection" class="hero">
+      <h2 style="font-size: 2rem; color: #1e40af; margin-bottom: 1rem;">Gazedi...</h2>
+    <p style="font-size: 1rem; color: #374151; margin-bottom: 2rem;">
+    </p>
+    <div style="display: grid; gap: 1.5rem; max-width: 600px; margin: 0 auto; padding: 0 1rem;">
+      <div style="background: gray; padding: 1.25rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem;">
+        <div>
+         
+          <a style="color: #1e40af; text-decoration: none;"><strong><h3>Introducing Gazedi...</h3></strong></a>
+          <p>
+            •What is Gazedi..?
+          </p>
+        </div>
+      </div>
+      <div style="background: gray; padding: 1.25rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem;">
+        <div>
+          
+          <a style="color: #1e40af; text-decoration: none;">  <strong>Why Use Gazedi...???</strong></a>
+        </div>
+      </div>
+      <div style="background: gray; padding: 1.25rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem;">
+        <div>
+          
+          <a href="t.me/Hisidisu" style="color: #1e40af; text-decoration: none;"><strong>Telegram Support</strong></a>
+        </div>
+      </div>
+    </div>
+             
+          
+          
+  </section>
+
+  
+  <div>
+    
+    <br>
+    <br>
+  
+  
+  <section id="signupForm" class="form-section">
+   <form onsubmit="event.preventDefault(); handleSignup(); signUpUser(
+  document.getElementById('name').value,
+  document.getElementById('email').value,
+  document.getElementById('password').value
+);">
+
+    
+  
+    <form onsubmit="event.preventDefault(); handleSignup()>
+    
+    
+    
+    
+      <h3>Sign Up</h3>
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="Your name" required />
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Email address" required />
+      <label for="password">Password</label>
+      <div class="input-group">
+        <input type="password" id="password" placeholder="Create a password" required />
+        <span class="toggle-password" onclick="togglePassword('password')">👁️</span>
+      </div>
+      <p style="text-align:center; font-size:0.85rem; margin-bottom:1rem;">Already have an account?
+        <a href="#" onclick="toggleForm('login')" style="color:#1e40af;text-decoration:none;font-weight:500;">Login</a>
+      </p>
+      <button onclick="signUpUser(
+  document.getElementById('name').value,
+  document.getElementById('email').value,
+  document.getElementById('password').value
+)">Sign Up</button>
+
+    </form>
+    
+  </div>
+  </section>
+
+  <section id="loginForm" class="form-section">
+    <form onsubmit="event.preventDefault();login();">
+      <h3>Login</h3>
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter your email" required />
+      <label for="password">Password</label>
+      <div class="input-group">
+        <input type="password" id="password" placeholder="Enter your password" required />
+        <span class="toggle-password" onclick="togglePassword('password')">👁️</span>
+      </div>
+      <div class="form-footer">
+        <a href="#">Forgot Password?</a>
+      </div>
+      <p style="text-align:center; font-size:0.85rem; margin-bottom:1rem;">Don't have an account?
+        <a href="#" onclick="toggleForm('signup')" style="color:#1e40af;text-decoration:none;font-weight:500;">Sign Up</a>
+      </p>
+      <button onclick="loginUser(
+  document.getElementById('email').value,
+  document.getElementById('password').value
+)">Login</button>
+    </form>
+  </section>
+  
+  <div>
+<!-- ✅ Updated Help Section -->
+  <section id="helpPage" class="help-page">
+    <h2 style="font-size: 2rem; color: #1e40af; margin-bottom: 1rem;">Support</h2>
+    <p style="font-size: 1rem; color: #374151; margin-bottom: 2rem;">
+      If you need help, you can contact us through the following methods:
+    </p>
+    <div style="display: grid; gap: 1.5rem; max-width: 600px; margin: 0 auto; padding: 0 1rem;">
+      <div style="background: #ffffff; padding: 1.25rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem;">
+        <span style="font-size: 1.5rem;">📧</span>
+        <div>
+         
+          <a href="mailto:dipakbhatt964@gmail.com" style="color: #1e40af; text-decoration: none;"><strong>Mail Support</strong></a>
+        </div>
+      </div>
+      <div style="background: #ffffff; padding: 1.25rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem;">
+        <span style="font-size: 1.5rem;">💬</span>
+        <div>
+          
+          <a href="https://wa.me/9779806471743" style="color: #1e40af; text-decoration: none;">  <strong>WhatsApp Support</strong></a>
+        </div>
+      </div>
+      <div style="background: #ffffff; padding: 1.25rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem;">
+        <span style="font-size: 1.5rem;">💬</span>
+        <div>
+          
+          <a href="t.me/Hisidisu" style="color: #1e40af; text-decoration: none;"><strong>Telegram Support</strong></a>
+        </div>
+      </div>
+    </div>
+    <br>
+    
+  </....>
+  
+    <div style="display: grid; gap: 1.5rem; max-width: 600px; margin: 0 auto; padding: 0 1rem;">
+      <div style="background: #ffffff; padding: 1.25rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem;">
+        <span style="font-size: 1.5rem;">💬</span>
+        <div> 
+          
+          <a href="https://m.me/Dipakraj15?hash=AbaI5-FC778JmMuH&source=qr_link_share"style="color: #1e40af; text-decoration: none;"><strong>Messanger Support</strong></a>
+        </div>
+      </div>
+      <div style="background: #ffffff; padding: 1.25rem 1.5rem; border-radius: 0.75rem; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem;">
+        <span style="font-size: 1.5rem;">💬</span>
+        <div>
+          
+          <a href="viber://chat?number=+9779806463852" style="color: #1e40af; text-decoration: none;">  <strong>Viber Support</strong></a>
+        </div>
+      </div>
+      
+        </div>
+      </div>
+    </div>
+</div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Gazedi. All rights reserved.</p>
+  </footer>
+<!-- Firebase App (Core SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+
+<!-- Firebase Auth -->
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
+
+<!-- Firebase Realtime Database -->
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js"></script>
+
+
+
+
+</body>
+</html>
+
